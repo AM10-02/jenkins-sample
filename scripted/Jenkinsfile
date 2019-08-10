@@ -1,5 +1,33 @@
+properties([
+	disableConcurrentBuilds(),
+	buildDiscarder(
+			logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
+	)
+])
+
+def util = null
+
 node('master') {
-	stage('pwd'){
-		println pwd()
+	// utilをcheckoutしてロードします
+	stage('load utils') {
+		checkout poll: false, scm: [
+			$class: 'GitSCM', branches: [[name: 'develop']],
+			doGenerateSubmoduleConfigurations: false,
+			extensions: [
+				[$class: 'CheckoutOption', timeout: 60],
+				[$class: 'CleanBeforeCheckout'],
+				[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'utils']]],
+				[$class: 'CloneOption', noTags: false, reference: '', shallow: true, timeout: 60],
+				[$class: 'PruneStaleBranch']
+			],
+			submoduleCfg: [],
+			userRemoteConfigs: [[url: 'https://github.com/AM10-02/jenkins-sample.git']]
+		]
+		util = load "utils/sample_util.groovy"
+	}
+
+	// コンソールテキストを成果物として保存します
+	stage('save console text') {
+		util.archiveConsoleText()
 	}
 }
