@@ -10,10 +10,10 @@ properties([
 ])
 
 node('master') {
-	try {
-		// currentBuild.resultだとsandboxに引っかかるので別途定義
-		def result = null
+	// currentBuild.resultだとsandboxに引っかかるので別途定義
+	def result = null
 
+	try {
 		stage('setup') {
 			// プラグインをGitHubリポジトリから取得します
 			checkout poll: false, scm: [
