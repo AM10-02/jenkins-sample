@@ -1,3 +1,4 @@
+// パラメータを設定します
 properties([
 	disableConcurrentBuilds(),
 	buildDiscarder(
