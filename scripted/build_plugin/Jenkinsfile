@@ -58,7 +58,7 @@ node('master') {
 	} finally {
 		// resultに合わせてメールを送信します
 		def message = ""
-		switch (result)) {
+		switch (result) {
 			case Result.SUCCESS:
 				message = """${env.BUILD_URL}
 ビルドが成功しました
