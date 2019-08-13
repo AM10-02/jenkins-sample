@@ -1,0 +1,83 @@
+// パラメータを設定します
+properties([
+	disableConcurrentBuilds(),
+	parameters([
+		booleanParam(defaultValue: false, description: 'packageのテストをskipします。', name: 'SKIP_TESTS')
+	]),
+	buildDiscarder(
+		logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
+	)
+])
+
+pipeline {
+	agent {
+		label 'master'
+	}
+
+	stages {
+		stage('setup') {
+			steps {
+				// プラグインをGitHubリポジトリから取得します
+				checkout poll: false, scm: [
+					$class: 'GitSCM', branches: [[name: '*/develop']],
+					doGenerateSubmoduleConfigurations: false,
+					extensions: [
+						[$class: 'CheckoutOption', timeout: 60],
+						[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: false, timeout: 60],
+						[$class: 'CleanBeforeCheckout'],
+						[$class: 'PruneStaleBranch']
+					],
+					submoduleCfg: [],
+					userRemoteConfigs: [[url: 'https://github.com/AM10-02/FilteredMailPlugin.git']]
+				]
+			}
+		}
+
+		stage('clean') {
+			steps {
+				// cleanを行います
+				sh "mvn clean"
+			}
+		}
+
+		stage('package') {
+			steps {
+				// パッケージを作成します
+				// ビルドパラメータによって、テストを行うかのオプションを変更します
+				sh "mvn package -DskipTests=${env.SKIP_TESTS ?: "false"}"
+			}
+		}
+
+		stage('archive') {
+			steps {
+				// 作成したプラグインを成果物として保存します
+				archiveArtifacts 'target/*.hpi'
+			}
+		}
+	}
+
+	post {
+		success {
+			sendMail("ビルドが失敗しました")
+		}
+
+		unstable {
+			sendMail("ビルドは成功しましたが、警告が発生しています")
+		}
+
+		aborted {
+			sendMail("ビルドが中断されました")
+		}
+
+		failure {
+			sendMail("ビルドが失敗しました")
+		}
+	}
+}
+
+def sendMail(message) {
+	message = """${env.BUILD_URL}
+${message}
+"""
+	mail body: message, from: 'akito_akegarasu@hotmail.co.jp', subject: 'ビルド完了通知', to: 'jenkins-sample@exsample.co.jp'
+}
