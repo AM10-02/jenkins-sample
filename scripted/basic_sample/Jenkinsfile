@@ -12,7 +12,7 @@ node('master') {
 	// utilをcheckoutしてロードします
 	stage('load utils') {
 		checkout poll: false, scm: [
-			$class: 'GitSCM', branches: [[name: 'develop']],
+			$class: 'GitSCM', branches: [[name: 'master']],
 			doGenerateSubmoduleConfigurations: false,
 			extensions: [
 				[$class: 'CheckoutOption', timeout: 60],
