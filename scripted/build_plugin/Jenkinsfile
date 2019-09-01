@@ -17,7 +17,7 @@ node('master') {
 		stage('setup') {
 			// プラグインをGitHubリポジトリから取得します
 			checkout poll: false, scm: [
-				$class: 'GitSCM', branches: [[name: '*/develop']],
+				$class: 'GitSCM', branches: [[name: env.UTIL_BRANCH]],
 				doGenerateSubmoduleConfigurations: false,
 				extensions: [
 					[$class: 'CheckoutOption', timeout: 60],

@@ -1,0 +1,22 @@
+properties([
+	parameters([
+		string(defaultValue: '', description: '文字列のパラメータです', name: 'ARG_STRING', trim: true),
+		booleanParam(defaultValue: false, description: '真偽値のパラメータです', name: 'ARG_BOOLEAN'),
+		choice(choices: 'choice1\nchoice2\nchoice3\nchoice4\nchoice5', description: '選択のパラメータです', name: 'ARG_CHOICE')
+	])
+])
+
+stage('print args') {
+	println env.ARG_STRING
+	println env.ARG_BOOLEAN
+	println env.ARG_CHOICE
+}
+
+switch (Integer.parseInt(env.BUILD_NUMBER) % 3) {
+	case 1:
+		unstable 'unstable'
+		break
+	case 2:
+		throw new Exception("Error")
+		break
+}
