@@ -38,10 +38,10 @@ pipeline {
 				script {
 					// 上流ジョブの結果反映サンプルのため、ビルド番号によって結果を変えます
 					switch (Integer.parseInt(env.BUILD_NUMBER) % 5) {
-						case 1:
+						case 3:
 							unstable 'unstable'
 							break
-						case 2:
+						case 4:
 							error 'error'
 							break
 					}
