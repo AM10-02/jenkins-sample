@@ -41,7 +41,7 @@ pipeline {
 				stage('run1') {
 					steps {
 						script {
-							def build = build job: 'declarative/paralle_build', parameters: [
+							def build = build job: 'declarative/parallel_build', parameters: [
 								string(name: 'ARG_STRING', value: 'run1'),
 								booleanParam(name: 'ARG_BOOLEAN', value: false),
 								string(name: 'ARG_CHOICE', value: 'choice2'),
@@ -67,7 +67,7 @@ pipeline {
 				stage('run2') {
 					steps {
 						script {
-							def build = build job: 'declarative/paralle_build', parameters: [
+							def build = build job: 'declarative/parallel_build', parameters: [
 								string(name: 'ARG_STRING', value: 'run2'),
 								booleanParam(name: 'ARG_BOOLEAN', value: false),
 								string(name: 'ARG_CHOICE', value: 'choice4'),
