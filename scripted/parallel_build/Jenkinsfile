@@ -1,0 +1,37 @@
+// パラメータを設定します
+properties([
+	parameters([
+		string(defaultValue: '', description: '文字列のパラメータです', name: 'ARG_STRING', trim: true),
+		booleanParam(defaultValue: false, description: '真偽値のパラメータです', name: 'ARG_BOOLEAN'),
+		choice(choices: 'choice1\nchoice2\nchoice3\nchoice4\nchoice5', description: '選択のパラメータです', name: 'ARG_CHOICE')
+	]),
+	buildDiscarder(
+		logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
+	)
+])
+
+// パラメータの出力
+// 上流ジョブのjsonサンプル用にstageを分割して出力しています
+stage('print arg string') {
+	println env.ARG_STRING
+}
+
+stage('print arg boolean') {
+	println env.ARG_BOOLEAN
+}
+
+stage('print arg choice') {
+	println env.ARG_CHOICE
+}
+
+stage('set result') {
+	// 上流ジョブの結果反映サンプルのため、ビルド番号によって結果を変えます
+	switch (Integer.parseInt(env.BUILD_NUMBER) % 5) {
+		case 3:
+			unstable 'unstable'
+			break
+		case 4:
+			error 'error'
+			break
+	}
+}
