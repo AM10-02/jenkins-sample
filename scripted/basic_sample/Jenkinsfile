@@ -33,7 +33,7 @@ node('master') {
 		stage('run1') {
 			// parallel_buildのジョブを実行します
 			// 子ビルドの結果を本ビルドへの影響をなくし、6秒キューに溜めてタイミングをずらします
-			def build = build job: 'parallel_build', parameters: [
+			def build = build job: 'scripted/parallel_build', parameters: [
 				string(name: 'ARG_STRING', value: 'run1'),
 				booleanParam(name: 'ARG_BOOLEAN', value: false),
 				string(name: 'ARG_CHOICE', value: 'choice3'),
@@ -59,7 +59,7 @@ node('master') {
 		stage('run2') {
 			// parallel_buildのジョブを実行します
 			// 子ビルドの結果を本ビルドへの影響をなくし、12秒キューに溜めてタイミングをずらします
-			def build = build job: 'parallel_build', parameters: [
+			def build = build job: 'scripted/parallel_build', parameters: [
 				string(name: 'ARG_STRING', value: 'run2'),
 				booleanParam(name: 'ARG_BOOLEAN', value: false),
 				string(name: 'ARG_CHOICE', value: 'choice5'),
