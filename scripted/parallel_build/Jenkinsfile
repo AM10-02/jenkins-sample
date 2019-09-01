@@ -18,7 +18,7 @@ stage('print args') {
 }
 
 // 上流ジョブの結果反映サンプルのため、ビルド番号によって結果を変えます
-switch (Integer.parseInt(env.BUILD_NUMBER) % 4) {
+switch (Integer.parseInt(env.BUILD_NUMBER) % 5) {
 	case 1:
 		unstable 'unstable'
 		break
