@@ -44,6 +44,12 @@ node('master') {
 			def jsonStr = util.toJsonString(runExt)
 			def json = util.toJsonData(jsonStr)
 
+			// json使用例
+			println "Total Duration: ${json.durationMillis}"
+			json.stages.each {
+				println "Name: ${it.name}, Duration: ${it.durationMillis}"
+			}
+
 			// 子ビルドの結果を本ビルドに反映します
 			currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
 		}
@@ -63,6 +69,12 @@ node('master') {
 			def runExt = util.getRunExt(build.rawBuild)
 			def jsonStr = util.toJsonString(runExt)
 			def json = util.toJsonData(jsonStr)
+
+			// json使用例
+			println json.durationMillis
+			json.stages.each {
+				println "Name: ${it.name}, Duration: ${it.durationMillis}"
+			}
 
 			// 子ビルドの結果を本ビルドに反映します
 			currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))

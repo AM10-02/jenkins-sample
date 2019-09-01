@@ -11,9 +11,16 @@ properties([
 ])
 
 // パラメータの出力
-stage('print args') {
+// 上流ジョブのjsonサンプル用にstageを分割して出力しています
+stage('print arg string') {
 	println env.ARG_STRING
+}
+
+stage('print arg boolean') {
 	println env.ARG_BOOLEAN
+}
+
+stage('print arg choice') {
 	println env.ARG_CHOICE
 }
 
