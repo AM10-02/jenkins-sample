@@ -27,6 +27,64 @@ node('master') {
 		util = load "utils/sample_util.groovy"
 	}
 
+	// 並列で別ジョブを実行します
+	stage('runs') {
+		def runs = [:]
+		runs['run1'] = {
+			stage('run1') {
+				// parallel_buildのジョブを実行します
+				// 子ビルドの結果を本ビルドへの影響をなくし、6秒キューに溜めてタイミングをずらします
+				def build = build job: 'scripted/parallel_build', parameters: [
+					string(name: 'ARG_STRING', value: 'run1'),
+					booleanParam(name: 'ARG_BOOLEAN', value: false),
+					string(name: 'ARG_CHOICE', value: 'choice3'),
+				], propagate: false, quietPeriod: 6
+
+				// 実行したジョブのdescribeを取得します
+				def runExt = util.getRunExt(build.rawBuild)
+				def jsonStr = util.toJsonString(runExt)
+				def json = util.toJsonData(jsonStr)
+
+				// json使用例
+				println "Total Duration: ${json.durationMillis}"
+				json.stages.each {
+					println "Name: ${it.name}, Duration: ${it.durationMillis}"
+				}
+
+				// 子ビルドの結果を本ビルドに反映します
+				currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+			}
+		}
+
+		runs['run2'] = {
+			stage('run2') {
+				// parallel_buildのジョブを実行します
+				// 子ビルドの結果を本ビルドへの影響をなくし、12秒キューに溜めてタイミングをずらします
+				def build = build job: 'scripted/parallel_build', parameters: [
+					string(name: 'ARG_STRING', value: 'run2'),
+					booleanParam(name: 'ARG_BOOLEAN', value: false),
+					string(name: 'ARG_CHOICE', value: 'choice5'),
+				], propagate: false, quietPeriod: 12
+
+				// 実行したジョブのdescribeを取得します
+				def runExt = util.getRunExt(build.rawBuild)
+				def jsonStr = util.toJsonString(runExt)
+				def json = util.toJsonData(jsonStr)
+
+				// json使用例
+				println "Total Duration: ${json.durationMillis}"
+				json.stages.each {
+					println "Name: ${it.name}, Duration: ${it.durationMillis}"
+				}
+
+				// 子ビルドの結果を本ビルドに反映します
+				currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+			}
+		}
+
+		parallel runs
+	}
+
 	// コンソールテキストを成果物として保存します
 	stage('save console text') {
 		util.archiveConsoleText()

@@ -18,7 +18,7 @@ pipeline {
 		stage('load utils') {
 			steps {
 				checkout poll: false, scm: [
-					$class: 'GitSCM', branches: [[name: 'master']],
+					$class: 'GitSCM', branches: [[name: env.UTIL_BRANCH]],
 					doGenerateSubmoduleConfigurations: false,
 					extensions: [
 						[$class: 'CheckoutOption', timeout: 60],
@@ -32,6 +32,62 @@ pipeline {
 				]
 				script {
 					util = load "utils/sample_util.groovy"
+				}
+			}
+		}
+
+		stage('runs') {
+			parallel {
+				stage('run1') {
+					steps {
+						script {
+							def build = build job: 'declarative/parallel_build', parameters: [
+								string(name: 'ARG_STRING', value: 'run1'),
+								booleanParam(name: 'ARG_BOOLEAN', value: false),
+								string(name: 'ARG_CHOICE', value: 'choice2'),
+							], propagate: false, quietPeriod: 6
+
+							// 実行したジョブのdescribeを取得します
+							def runExt = util.getRunExt(build.rawBuild)
+							def jsonStr = util.toJsonString(runExt)
+							def json = util.toJsonData(jsonStr)
+
+							// json使用例
+							println "Total Duration: ${json.durationMillis}"
+							json.stages.each {
+								println "Name: ${it.name}, Duration: ${it.durationMillis}"
+							}
+
+							// 子ビルドの結果を本ビルドに反映します
+							currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+						}
+					}
+				}
+
+				stage('run2') {
+					steps {
+						script {
+							def build = build job: 'declarative/parallel_build', parameters: [
+								string(name: 'ARG_STRING', value: 'run2'),
+								booleanParam(name: 'ARG_BOOLEAN', value: false),
+								string(name: 'ARG_CHOICE', value: 'choice4'),
+							], propagate: false, quietPeriod: 6
+
+							// 実行したジョブのdescribeを取得します
+							def runExt = util.getRunExt(build.rawBuild)
+							def jsonStr = util.toJsonString(runExt)
+							def json = util.toJsonData(jsonStr)
+
+							// json使用例
+							println "Total Duration: ${json.durationMillis}"
+							json.stages.each {
+								println "Name: ${it.name}, Duration: ${it.durationMillis}"
+							}
+
+							// 子ビルドの結果を本ビルドに反映します
+							currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+						}
+					}
 				}
 			}
 		}
