@@ -30,35 +30,33 @@ node('master') {
 			]
 		}
 
-		//
 		stage('clean') {
-			// cleanを行います
+			// mvnのcleanを行います
 			sh "mvn clean"
 		}
 
 		stage('package') {
 			// パッケージを作成します
 			// ビルドパラメータによって、テストを行うかのオプションを変更します
-			sh "mvn package -DskipTests=${env.SKIP_TESTS ?: "false"}"
+			sh "mvn package -DskipTests=${env.SKIP_TESTS ?: false}"
 		}
 
 		stage('archive') {
 			// 作成したプラグインを成果物として保存します
 			archiveArtifacts 'target/*.hpi'
 		}
-		result = Result.fromString(currentBuild.currentResult)
 	} catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
 		// 中断したときはresultをabortedに設定します
-		result = Result.ABORTED
+		currentBuild.rawBuild.result = Result.ABORTED
 		throw e
 	} catch (Exception e) {
 		// エラーが発生したときはresultをfailureに設定します
-		result = Result.FAILURE
+		currentBuild.rawBuild.result = Result.FAILURE
 		throw e
 	} finally {
 		// resultに合わせてメールを送信します
 		def message = ""
-		switch (result) {
+		switch (currentBuild.currentResult) {
 			case Result.SUCCESS:
 				message = """${env.BUILD_URL}
 ビルドが成功しました

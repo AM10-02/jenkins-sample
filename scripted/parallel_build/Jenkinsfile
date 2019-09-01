@@ -1,22 +1,28 @@
+// パラメータを設定します
 properties([
 	parameters([
 		string(defaultValue: '', description: '文字列のパラメータです', name: 'ARG_STRING', trim: true),
 		booleanParam(defaultValue: false, description: '真偽値のパラメータです', name: 'ARG_BOOLEAN'),
 		choice(choices: 'choice1\nchoice2\nchoice3\nchoice4\nchoice5', description: '選択のパラメータです', name: 'ARG_CHOICE')
-	])
+	]),
+	buildDiscarder(
+		logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
+	)
 ])
 
+// パラメータの出力
 stage('print args') {
 	println env.ARG_STRING
 	println env.ARG_BOOLEAN
 	println env.ARG_CHOICE
 }
 
-switch (Integer.parseInt(env.BUILD_NUMBER) % 3) {
+// 上流ジョブの結果反映サンプルのため、ビルド番号によって結果を変えます
+switch (Integer.parseInt(env.BUILD_NUMBER) % 4) {
 	case 1:
 		unstable 'unstable'
 		break
 	case 2:
-		throw new Exception("Error")
+		error 'error'
 		break
 }

@@ -45,7 +45,7 @@ node('master') {
 			def json = util.toJsonData(jsonStr)
 
 			// 子ビルドの結果を本ビルドに反映します
-			currentBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+			currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
 		}
 	}
 
@@ -65,7 +65,7 @@ node('master') {
 			def json = util.toJsonData(jsonStr)
 
 			// 子ビルドの結果を本ビルドに反映します
-			currentBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
+			currentBuild.rawBuild.result = Result.fromString(build.result).combine(Result.fromString(currentBuild.currentResult))
 		}
 	}
 
