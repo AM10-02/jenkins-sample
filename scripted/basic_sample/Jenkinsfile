@@ -71,7 +71,7 @@ node('master') {
 			def json = util.toJsonData(jsonStr)
 
 			// json使用例
-			println json.durationMillis
+			println "Total Duration: ${json.durationMillis}"
 			json.stages.each {
 				println "Name: ${it.name}, Duration: ${it.durationMillis}"
 			}
