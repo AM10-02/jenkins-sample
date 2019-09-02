@@ -1,6 +1,9 @@
 // パラメータを設定します
 properties([
 	disableConcurrentBuilds(),
+	parameters([
+		string(defaultValue: 'master', description: 'ユーティリティのブランチ', name: 'BRANCH_NAME', trim: true)
+	]),
 	buildDiscarder(
 			logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
 	)
@@ -12,7 +15,7 @@ node('master') {
 	// utilをcheckoutしてロードします
 	stage('load utils') {
 		checkout poll: false, scm: [
-			$class: 'GitSCM', branches: [[name: 'master']],
+			$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]],
 			doGenerateSubmoduleConfigurations: false,
 			extensions: [
 				[$class: 'CheckoutOption', timeout: 60],

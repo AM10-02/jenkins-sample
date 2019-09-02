@@ -2,6 +2,7 @@
 properties([
 	disableConcurrentBuilds(),
 	parameters([
+		string(defaultValue: 'master', description: 'プラグインのブランチ', name: 'BRANCH_NAME', trim: true),
 		booleanParam(defaultValue: false, description: 'packageのテストをskipします。', name: 'SKIP_TESTS')
 	]),
 	buildDiscarder(
@@ -19,7 +20,7 @@ pipeline {
 			steps {
 				// プラグインをGitHubリポジトリから取得します
 				checkout poll: false, scm: [
-					$class: 'GitSCM', branches: [[name: env.UTIL_BRANCH]],
+					$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]],
 					doGenerateSubmoduleConfigurations: false,
 					extensions: [
 						[$class: 'CheckoutOption', timeout: 60],
@@ -33,18 +34,14 @@ pipeline {
 			}
 		}
 
-		stage('clean') {
-			steps {
-				// cleanを行います
-				sh "mvn clean"
-			}
-		}
-
 		stage('package') {
 			steps {
-				// パッケージを作成します
-				// ビルドパラメータによって、テストを行うかのオプションを変更します
-				sh "mvn package -DskipTests=${env.SKIP_TESTS ?: "false"}"
+				// 並列mvnビルドが動かないようにlockする
+				lock('filtered-email-plugin') {
+					// パッケージを作成します
+					// ビルドパラメータによって、テストを行うかのオプションを変更します
+					sh "mvn clean package -DskipTests=${env.SKIP_TESTS ?: "false"}"
+				}
 			}
 		}
 
