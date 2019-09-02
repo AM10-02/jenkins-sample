@@ -31,15 +31,18 @@ node('master') {
 			]
 		}
 
-		stage('clean') {
-			// mvnのcleanを行います
-			sh "mvn clean"
-		}
+		// 並列mvnビルドが動かないようにlockする
+		lock('filtered-email-plugin') {
+			stage('clean') {
+				// mvnのcleanを行います
+				sh "mvn clean"
+			}
 
-		stage('package') {
-			// パッケージを作成します
-			// ビルドパラメータによって、テストを行うかのオプションを変更します
-			sh "mvn package -DskipTests=${env.SKIP_TESTS ?: false}"
+			stage('package') {
+				// パッケージを作成します
+				// ビルドパラメータによって、テストを行うかのオプションを変更します
+				sh "mvn package -DskipTests=${env.SKIP_TESTS ?: "false"}"
+			}
 		}
 
 		stage('archive') {
